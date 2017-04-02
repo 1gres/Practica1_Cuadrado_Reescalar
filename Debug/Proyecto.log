@@ -1,0 +1,9 @@
+﻿  main.cpp
+d:\programacio 3\informatica grafica\practica1_cuadrado_reescalar\src\main.cpp(193): warning C4305: 'argumento': truncamiento de 'double' a 'GLclampf'
+d:\programacio 3\informatica grafica\practica1_cuadrado_reescalar\src\main.cpp(237): warning C4244: '=': conversión de 'double' a 'GLfloat'; posible pérdida de datos
+d:\programacio 3\informatica grafica\practica1_cuadrado_reescalar\src\main.cpp(250): warning C4244: '=': conversión de 'double' a 'GLfloat'; posible pérdida de datos
+d:\programacio 3\informatica grafica\practica1_cuadrado_reescalar\src\main.cpp(182): warning C4101: 'x': variable local sin referencia
+d:\programacio 3\informatica grafica\practica1_cuadrado_reescalar\src\main.cpp(318): warning C4244: '=': conversión de 'double' a 'GLfloat'; posible pérdida de datos
+d:\programacio 3\informatica grafica\practica1_cuadrado_reescalar\src\main.cpp(326): warning C4244: '=': conversión de 'double' a 'GLfloat'; posible pérdida de datos
+  Proyecto.vcxproj -> D:\PROGRAMACIO 3\INFORMATICA GRAFICA\Practica1_Cuadrado_Reescalar\Debug\Practica1.exe
+  Proyecto.vcxproj -> D:\PROGRAMACIO 3\INFORMATICA GRAFICA\Practica1_Cuadrado_Reescalar\Debug\Practica1.pdb (Full PDB)
