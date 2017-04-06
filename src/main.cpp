@@ -32,7 +32,10 @@ bool TeclaUp = false;
 bool TeclaDown = false;
 bool TeclaLeft = false;
 bool TeclaRight = false;
+bool Tecla1 = false;
+bool Tecla2 = false;
 GLfloat valor;
+GLfloat valor2;
 
 static void error_callback(int error, const char* description)
 {
@@ -88,12 +91,14 @@ int main() {
 	glfwGetFramebufferSize(window, &screenWithd, &screenHeight);
 	glViewport(0, 0, screenWithd, screenHeight);
 
+	glEnable(GL_DEPTH_TEST);
+
 	//cargamos los shader
 	//GLuint programID = LoadShaders("./src/SimpleVertexShader.vertexshader", "./src/SimpleFragmentShader.fragmentshader");
 	Shader move("./src/SimpleVertexShader.vertexshader", "./src/SimpleFragmentShader.fragmentshader");
 
 	// Definir el buffer de vertices
-	GLfloat vertexs[] =
+	/*GLfloat VertexBufferCube[] =
 	{
 		//Positions			//colors           //Texture Coords 
 		0.5f,  0.5f, 0.0f,		0.0f,0.1f,0.4f,  1.0f,1.0f,// Top Right
@@ -104,21 +109,77 @@ int main() {
 	};
 
 	// Definir el EBO 
-	GLuint IndexBufferObject[]{
+	GLuint CubesPositionBuffer[]{
 
 		0,1,2, //Triangle 1 Super Esquerra, Inferior Esquerra, Super Dret
 		0,2,3  //Triangle 2 Super Esquerra, Inferior dret, Superior Dret
+	};*/
+
+	GLfloat VertexBufferCube[] = {
+		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+		0.5f , -0.5f, -0.5f,  1.0f, 0.0f,
+		0.5f ,  0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f ,  0.5f, -0.5f,  1.0f, 1.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		0.5f , -0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f ,  0.5f,  0.5f,  1.0f, 1.0f,
+		0.5f ,  0.5f,  0.5f,  1.0f, 1.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+		0.5f ,  0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f ,  0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f , -0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f , -0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f , -0.5f,  0.5f,  0.0f, 0.0f,
+		0.5f ,  0.5f,  0.5f,  1.0f, 0.0f,
+
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f , -0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f , -0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f , -0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f ,  0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f ,  0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f ,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 	};
+
+	vec3 CubesPositionBuffer[] = {
+		vec3(0.0f ,  0.0f,  0.0f),
+		vec3(2.0f ,  5.0f, -15.0f),
+		vec3(-1.5f, -2.2f, -2.5f),
+		vec3(-3.8f, -2.0f, -12.3f),
+		vec3(2.4f , -0.4f, -3.5f),
+		vec3(-1.7f,  3.0f, -7.5f),
+		vec3(1.3f , -2.0f, -2.5f),
+		vec3(1.5f ,  2.0f, -2.5f),
+		vec3(1.5f ,  0.2f, -1.5f),
+		vec3(-1.3f,  1.0f, -1.5f)
+	};
+
 
 	// Crear los VBO, VAO y EBO
 	GLuint VBO;
-	GLuint EBO;
 	GLuint VAO;
 
 
 	//reservar memoria para el VAO (VBO + EVO), VBO (Nuve de puntos de nuestro objeto (Posicionm, color, orden textura, indice)) y EBO (Triangularizacion (Vertice X e Y) (Grupos de 3))
 	glGenBuffers(1, &VBO); //Pasa x numero de taquillas al vector VBO //glGenBuffer(Numbuffer, &VBO)
-	glGenBuffers(1, &EBO);
 	glGenVertexArrays(1, &VAO);
 
 	//Establecer el objeto
@@ -127,21 +188,14 @@ int main() {
 
 	//Declarar el VBO y el EBO
 	glBindBuffer(GL_ARRAY_BUFFER, VBO); //Ordena la informacio per cada taquilla (Buffer)
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexs), vertexs, GL_STATIC_DRAW); //Li pases la informacio dels vertex
+	glBufferData(GL_ARRAY_BUFFER, sizeof(VertexBufferCube), VertexBufferCube, GL_STATIC_DRAW); //Li pases la informacio dels vertex
 																			 //Variable(Variable especial per al VBO/EBO, tamany del que volem pasar, nom de la variable d'on passem el tamany, Dinamic/Statick -> Dibuixar)
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(IndexBufferObject), IndexBufferObject, GL_STATIC_DRAW); //Li pases el ordre crear anteriorment
-
 	// bufer de posicion																									 //Establecer las propiedades de los vertices
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (GLvoid*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GL_FLOAT), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
 
-	//bufer de color
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (GLvoid*)(3*sizeof(GLfloat)));
-	glEnableVertexAttribArray(1);
-
 	//Buffer textura
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (GLvoid*)(6 * sizeof(GLfloat)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GL_FLOAT), (GLvoid*)(3 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(2);
 
 	//liberar el buffer de vertices
@@ -178,108 +232,97 @@ int main() {
 	SOIL_free_image_data(image2);
 	glBindTexture(GL_TEXTURE_2D, 1);
 
-	GLfloat Transparencia = 0.5;
-	GLfloat x;
-	
+	GLfloat AngleRotacioX = 0.0;
+	GLfloat AngleRotacioY = 0.0;
+
+	GLfloat AspectRatio = WIDTH / HEIGHT;
+
+	//Camara
+	mat4 projection;
+	projection = perspective(60.0f, AspectRatio, 0.1f, 10.0f);
 
 	//bucle de dibujado
 	while (!glfwWindowShouldClose(window))
 	{
-		GLfloat x = valor;
 		// Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
 		glfwPollEvents();
 
 		//Establecer el color de fondo
 		glClearColor(0.0, 1.0, 0.8, 1.0); //RGB + ALPHA
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		if (Tecla1) {
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, texture);
+			glUniform1i(glGetUniformLocation(move.Program, "Texture1"), 0);
+		}
+		if (Tecla2) {
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, texture2);
+			glUniform1i(glGetUniformLocation(move.Program, "Texture1"), 1);
+		}
 		//Carrega de texturas
 		move.USE();
 
-		mat4 transform;
-		transform = translate(transform, vec3(0.5f, 0.5f, 0.0f));
-				
-		if (TeclaLeft) {
-			
-			transform = rotate(transform, x, vec3(0.0f, 0.0f, 1.0f));
+		mat4 model;
+		mat4 view; 
+	
+		model = rotate(model, AngleRotacioX , vec3(0.5f,0.0f, 0.0f));
+		model = rotate(model, AngleRotacioY, vec3(0.0f, 0.5f, 0.0f));
+		model = scale(model, vec3(0.5f, 0.5f, 0.5f));
+		model = translate(model, vec3(0.0f, -0.5f, 0.0f));
+
+		view = translate(view, vec3(0.0f, 0.0f, -0.3f));
+		
+		//model = rotate(model, (GLfloat)glfwGetTime() *1.0f,vec3(0.1f, 0.1f, 0.0f));
+		//view = scale(view, vec3(0.5f, 0.5f, 0.0f));
+
+		GLint ProjLoc = glGetUniformLocation(move.Program, "projection");
+		GLint ViewLoc = glGetUniformLocation(move.Program, "view");
+		GLint ModelLoc = glGetUniformLocation(move.Program, "model");
+
+		glUniformMatrix4fv(ProjLoc, 1, GL_FALSE, value_ptr(projection));
+		glUniformMatrix4fv(ViewLoc, 1, GL_FALSE, value_ptr(view));
+		glUniformMatrix4fv(ModelLoc, 1, GL_FALSE, value_ptr(model));
+
+		if (TeclaDown) {
+			AngleRotacioX -= 0.05;
+			TeclaDown = false;
 		}
 
-		if (TeclaRight) {
-			
-			transform = rotate(transform, x, vec3(0.0f, 0.0f, 1.0f));
-		}
-
-		transform = scale(transform, vec3(0.5f, 0.5f, 0.0f));
-
-		
-		
-		GLint tranformLocation = glGetUniformLocation(move.Program, "transform");
-		glUniformMatrix4fv(tranformLocation, 1, GL_FALSE, value_ptr(transform));
-		
-
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture);
-		glUniform1i(glGetUniformLocation(move.Program, "Texture1"), 0);
-
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, texture2);
-		glUniform1i(glGetUniformLocation(move.Program, "Texture2"), 1);
-
-		glUniform1f(glGetUniformLocation(move.Program, "Transparencia"), Transparencia);
-
-		if (TeclaUp)
-		{
-			
-			if (Transparencia <= 0) {
-				Transparencia = 0; //controlem tranparencia maxima
-			}
-			else {
-				Transparencia = Transparencia - 0.1;
-			}
-			glUniform1f(glGetUniformLocation(move.Program, "Transparencia"), Transparencia);
+		if (TeclaUp) {
+			AngleRotacioX += 0.05;
 			TeclaUp = false;
 		}
 
-		if (TeclaDown)
+		if (TeclaRight)
 		{
-			if (Transparencia >= 1) {
-				Transparencia = 1; //controlem tranparencia maxima
-				
-			}
-			else {
-				Transparencia = Transparencia + 0.1;
-			}
-			glUniform1f(glGetUniformLocation(move.Program, "Transparencia"), Transparencia);
-			TeclaDown = false;
-
+			AngleRotacioY += 0.05;
+			TeclaRight = false;
 		}
 
+		if (TeclaLeft)
+		{
+			AngleRotacioY -= 0.05;
+			TeclaLeft = false;
+		}
+		
 		//pintar el VAO
 		glBindVertexArray(VAO);
 
-		//LINE: Linieas, FILL: COlor, POINT: Punts
-		//pintar con lineas //Aqui pintaries les linies del triangle
-		if (TeclaW) {
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-		}
-		else {
-			//pintar con triangulos //Pintar la superficie (Amb el color)
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		}
-		
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glBindVertexArray(0);
 
 		// Swap the screen buffer
 		glfwSwapBuffers(window);
 
 	}
+
 	// liberar la memoria de los VAO, EBO y VBO
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
-	glDeleteBuffers(1, &EBO);
-
+	
 	// Terminate GLFW, clearing any resources allocated by GLFW.
 	glfwDestroyWindow(window);
 	glfwTerminate();
@@ -299,33 +342,39 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			TeclaW = true;
 	}
 
-	if (key == GLFW_KEY_UP && action == GLFW_PRESS)
+	if (key == GLFW_KEY_UP)
 	{
 		if (TeclaUp)
 			TeclaUp = false;
 		else
 			TeclaUp = true;
 	}
-	if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
-	{
+	if (key == GLFW_KEY_DOWN)
 		if (TeclaDown)
 			TeclaDown = false;
 		else
 			TeclaDown = true;
-	}
+	
 	if (key == GLFW_KEY_LEFT )
-	{
-		valor = valor + 0.1;
-		TeclaLeft = true;
-	}
-	else
-		TeclaLeft = false;
+		if (TeclaLeft)
+			TeclaLeft = false;
+		else
+			TeclaLeft = true;
 
 	if (key == GLFW_KEY_RIGHT )
-	{
-		valor = valor - 0.1;
-		TeclaRight = true;	
-	}
-	else
-		TeclaRight = false;
+		if (TeclaRight)
+			TeclaRight = false;
+		else
+			TeclaRight = true;
+
+	if( key == GLFW_KEY_1 && action == GLFW_PRESS)
+		if (Tecla1)
+			Tecla1 = false;
+		else
+			Tecla1 = true;
+	if (key == GLFW_KEY_2 && action == GLFW_PRESS)
+		if (Tecla2)
+			Tecla2 = false;
+		else
+			Tecla2 = true;
 }
