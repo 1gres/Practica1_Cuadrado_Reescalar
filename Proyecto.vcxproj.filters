@@ -33,4 +33,12 @@
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="src\SimpleFragmentShader.fragmentshader">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="src\SimpleVertexShader.vertexshader">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+  </ItemGroup>
 </Project>

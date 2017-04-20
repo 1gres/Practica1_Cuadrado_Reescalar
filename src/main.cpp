@@ -238,8 +238,7 @@ int main() {
 	GLfloat AspectRatio = WIDTH / HEIGHT;
 
 	//Camara
-	mat4 projection;
-	projection = perspective(60.0f, AspectRatio, 0.1f, 10.0f);
+	
 
 	//bucle de dibujado
 	while (!glfwWindowShouldClose(window))
@@ -266,17 +265,17 @@ int main() {
 
 		mat4 model;
 		mat4 view; 
-	
-		model = rotate(model, AngleRotacioX , vec3(0.5f,0.0f, 0.0f));
-		model = rotate(model, AngleRotacioY, vec3(0.0f, 0.5f, 0.0f));
-		model = scale(model, vec3(0.5f, 0.5f, 0.5f));
-		model = translate(model, vec3(0.0f, -0.5f, 0.0f));
+		mat4 projection;
 
-		view = translate(view, vec3(0.0f, 0.0f, -0.3f));
+		projection = perspective(60.0f, AspectRatio, 0.1f, 1000.0f);
+
+		model = scale(model, vec3(0.2f, 0.2f, 0.2f));
+		model = rotate(model, AngleRotacioX , vec3(1.0f,0.0f, 0.0f));
+		model = rotate(model, AngleRotacioY, vec3(0.0f, 1.0f, 0.0f));
+		model = translate(model, vec3(0.0f, 0.0f, 0.0f));
+
+		view = translate(view, vec3(0.2f, 0.4f, -0.3f));
 		
-		//model = rotate(model, (GLfloat)glfwGetTime() *1.0f,vec3(0.1f, 0.1f, 0.0f));
-		//view = scale(view, vec3(0.5f, 0.5f, 0.0f));
-
 		GLint ProjLoc = glGetUniformLocation(move.Program, "projection");
 		GLint ViewLoc = glGetUniformLocation(move.Program, "view");
 		GLint ModelLoc = glGetUniformLocation(move.Program, "model");
@@ -312,7 +311,24 @@ int main() {
 
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
+		
+		for (GLint i = 1; i < 10; i++)
+		{
+			mat4 model;
+			model = translate(model, CubesPositionBuffer[i]);
+			
+			model = rotate(model, (GLfloat)glfwGetTime()*10.0f, vec3(1.0f, 0.3f, 0.0f));
+			glUniformMatrix4fv(glGetUniformLocation(move.Program, "model"), 1, GL_FALSE, value_ptr(model));
+			/*
+			model = rotate(model, (GLfloat)glfwGetTime() *1.0f, CubesPositionBuffer[1]);
+			model = GenerateModelMatrix(vec3(0.f), vec3((GLfloat)glfwGetTime()*0.1f, (GLfloat)glfwGetTime()*0.5f, 0), CubesPositionBuffer[1]);
+			glUniformMatrix4fv(glGetUniformLocation(move.Program, "model"), 1, GL_FALSE, value_ptr(model));*/
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
+		
 		glBindVertexArray(0);
+
 
 		// Swap the screen buffer
 		glfwSwapBuffers(window);
