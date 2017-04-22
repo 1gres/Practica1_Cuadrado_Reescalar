@@ -34,8 +34,6 @@ bool TeclaLeft = false;
 bool TeclaRight = false;
 bool Tecla1 = false;
 bool Tecla2 = false;
-GLfloat valor;
-GLfloat valor2;
 
 static void error_callback(int error, const char* description)
 {
@@ -64,7 +62,7 @@ int main() {
 	GLFWwindow* window;
 	glfwSetErrorCallback(error_callback);
 
-	window = glfwCreateWindow(WIDTH, HEIGHT, "Practica Reescalado", nullptr, nullptr);
+	window = glfwCreateWindow(WIDTH, HEIGHT, "Practica Cuadrado 3D + Friends", nullptr, nullptr);
 	if (!window) {
 		cout << "Error al crear la ventana" << endl;
 		glfwTerminate();
@@ -255,7 +253,7 @@ int main() {
 			glBindTexture(GL_TEXTURE_2D, texture);
 			glUniform1i(glGetUniformLocation(move.Program, "Texture1"), 0);
 		}
-		if (Tecla2) {
+		else if (Tecla2) {
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, texture2);
 			glUniform1i(glGetUniformLocation(move.Program, "Texture1"), 1);
@@ -267,15 +265,15 @@ int main() {
 		mat4 view; 
 		mat4 projection;
 
-		projection = perspective(60.0f, AspectRatio, 0.1f, 1000.0f);
+		projection = perspective(45.0f, AspectRatio, 0.1f, 1000.0f);
 
-		model = scale(model, vec3(0.2f, 0.2f, 0.2f));
+		model = translate(model, vec3(0.0f, -0.5f, 0.0f));
 		model = rotate(model, AngleRotacioX , vec3(1.0f,0.0f, 0.0f));
 		model = rotate(model, AngleRotacioY, vec3(0.0f, 1.0f, 0.0f));
-		model = translate(model, vec3(0.0f, 0.0f, 0.0f));
+		model = scale(model, vec3(0.5f, 0.5f, 0.5f));
 
-		view = translate(view, vec3(0.2f, 0.4f, -0.3f));
-		
+		view = translate(view, vec3(0.0f, 0.0f, -3.f));
+				
 		GLint ProjLoc = glGetUniformLocation(move.Program, "projection");
 		GLint ViewLoc = glGetUniformLocation(move.Program, "view");
 		GLint ModelLoc = glGetUniformLocation(move.Program, "model");
@@ -285,12 +283,12 @@ int main() {
 		glUniformMatrix4fv(ModelLoc, 1, GL_FALSE, value_ptr(model));
 
 		if (TeclaDown) {
-			AngleRotacioX -= 0.05;
+			AngleRotacioX += 0.05;
 			TeclaDown = false;
 		}
 
 		if (TeclaUp) {
-			AngleRotacioX += 0.05;
+			AngleRotacioX -= 0.05;
 			TeclaUp = false;
 		}
 
@@ -315,9 +313,11 @@ int main() {
 		for (GLint i = 1; i < 10; i++)
 		{
 			mat4 model;
+	
 			model = translate(model, CubesPositionBuffer[i]);
-			
-			model = rotate(model, (GLfloat)glfwGetTime()*10.0f, vec3(1.0f, 0.3f, 0.0f));
+			model = rotate(model, (GLfloat)glfwGetTime()*5.0f, vec3(1.0f, 0.3f, 0.0f));
+		
+		
 			glUniformMatrix4fv(glGetUniformLocation(move.Program, "model"), 1, GL_FALSE, value_ptr(model));
 			/*
 			model = rotate(model, (GLfloat)glfwGetTime() *1.0f, CubesPositionBuffer[1]);
@@ -357,7 +357,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		else
 			TeclaW = true;
 	}
-
+	
 	if (key == GLFW_KEY_UP)
 	{
 		if (TeclaUp)
