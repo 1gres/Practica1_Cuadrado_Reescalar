@@ -253,7 +253,7 @@ int main() {
 			glBindTexture(GL_TEXTURE_2D, texture);
 			glUniform1i(glGetUniformLocation(move.Program, "Texture1"), 0);
 		}
-		else if (Tecla2) {
+		if (Tecla2) {
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, texture2);
 			glUniform1i(glGetUniformLocation(move.Program, "Texture1"), 1);
