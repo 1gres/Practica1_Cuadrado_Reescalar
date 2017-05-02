@@ -10,6 +10,7 @@
 #include <GLFW\glfw3.h>
 #include <iostream>
 #include "Shader.h"
+#include "Camara.h"
 
 //Nuevas Librerias
 #include <string>
@@ -34,6 +35,7 @@ bool TeclaLeft = false;
 bool TeclaRight = false;
 bool Tecla1 = false;
 bool Tecla2 = false;
+bool firstMouse = true;
 
 static void error_callback(int error, const char* description)
 {
@@ -237,6 +239,13 @@ int main() {
 
 	//Camara
 	
+	vec3 posicion_camara = vec3(0.0f,0.0f,3.0f);
+	vec3 apuntado_camara = vec3(0.0f, 0.0f, 0.0f);
+	vec3 direccion_camara = posicion_camara - apuntado_camara;
+	GLfloat sensivilidad = 0.02;
+	GLfloat FOV = 45.0;
+
+	Camara Camara_move(posicion_camara, direccion_camara, sensivilidad, FOV);
 
 	//bucle de dibujado
 	while (!glfwWindowShouldClose(window))
@@ -272,7 +281,9 @@ int main() {
 		model = rotate(model, AngleRotacioY, vec3(0.0f, 1.0f, 0.0f));
 		model = scale(model, vec3(0.5f, 0.5f, 0.5f));
 
-		view = translate(view, vec3(0.0f, 0.0f, -3.f));
+		//view = translate(view, vec3(0.0f, 0.0f, -3.f));
+		
+		view = Camara_move.LookAt();
 				
 		GLint ProjLoc = glGetUniformLocation(move.Program, "projection");
 		GLint ViewLoc = glGetUniformLocation(move.Program, "view");
@@ -282,25 +293,33 @@ int main() {
 		glUniformMatrix4fv(ViewLoc, 1, GL_FALSE, value_ptr(view));
 		glUniformMatrix4fv(ModelLoc, 1, GL_FALSE, value_ptr(model));
 
+		//detecta per pantalla quines tecles es presionen
+		Camara_move.DoMovement(window);
+
+		Camara_move.MouseMove(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	
+		//glfwSetCursorPosCallback(window, Camara_move.MouseMove);
+	
+		//Modificades totes les direccions
 		if (TeclaDown) {
-			AngleRotacioX += 0.05;
+			AngleRotacioX -= 0.05;
 			TeclaDown = false;
 		}
 
 		if (TeclaUp) {
-			AngleRotacioX -= 0.05;
+			AngleRotacioX += 0.05;
 			TeclaUp = false;
 		}
 
 		if (TeclaRight)
 		{
-			AngleRotacioY += 0.05;
+			AngleRotacioY -= 0.05;
 			TeclaRight = false;
 		}
 
 		if (TeclaLeft)
 		{
-			AngleRotacioY -= 0.05;
+			AngleRotacioY += 0.05;
 			TeclaLeft = false;
 		}
 		

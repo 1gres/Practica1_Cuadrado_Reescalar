@@ -1,0 +1,143 @@
+
+
+#include "Camara.h"
+
+
+Camara::Camara(vec3 position, vec3 direction, GLfloat sensitivity, GLfloat fov)
+{
+	cameraPos = position;
+	cameraFront = normalize(direction);
+
+	Sensitivity = sensitivity;
+	FOV = fov;
+
+}
+
+void Camara::DoMovement(GLFWwindow * window)
+{
+	GLfloat Deltatime = 0.0f;
+	GLfloat Lastframe = 0.0f;
+
+	GLfloat currentFrame = glfwGetTime();
+	Deltatime = currentFrame - Lastframe;
+	Lastframe = currentFrame;
+
+	GLint Status;
+	Status = glfwGetKey(window, GLFW_KEY_W);
+	if (Status == GLFW_PRESS) {
+		cameraPos -= cameraFront * Sensitivity * Deltatime;
+	}
+
+	Status = glfwGetKey(window, GLFW_KEY_S);
+	if (Status == GLFW_PRESS) {
+		cameraPos += cameraFront * Sensitivity * Deltatime;
+	}
+
+	Status = glfwGetKey(window, GLFW_KEY_A);
+	if (Status == GLFW_PRESS) {
+		cameraPos += normalize(cross(cameraFront, cameraUp)) * Sensitivity * Deltatime;
+	}
+				
+	Status = glfwGetKey(window, GLFW_KEY_D);
+	if (Status == GLFW_PRESS) {
+		cameraPos -= normalize(cross(cameraFront, cameraUp)) * Sensitivity * Deltatime;
+	}
+
+	/* //ADELANTE
+	Status = glfwGetKey(window, GLFW_KEY_S);
+	if (Status == GLFW_PRESS) {
+		cameraPos.z += cameraPos.z * Sensitivity;
+	}
+	//ATRAS
+	Status = glfwGetKey(window, GLFW_KEY_D);
+	if (Status == GLFW_PRESS) {
+		cameraPos.z -= cameraPos.z * Sensitivity;
+	}
+	*/
+}
+
+void Camara::MouseMove(GLFWwindow * window, double xpos, double ypos)
+{
+	GLfloat lastX = 400, lastY = 300;
+	//REVISAR
+	if (firstMouse)
+	{
+		LastMx = xpos;
+		LastMy = ypos;
+		firstMouse = false;
+	}
+
+	GLfloat xoffset = xpos - LastMx;
+	GLfloat yoffset = LastMy - ypos;
+
+	LastMx = xpos;
+	LastMy = ypos;
+
+
+	xoffset *= Sensitivity;
+	yoffset *= Sensitivity;
+
+	YAW += xoffset;
+	PITCH += yoffset;
+
+	if (PITCH > 89.0f)
+		PITCH = 89.0f;
+	if (PITCH < -89.0f)
+		PITCH = -89.0f;
+
+	vec3 front;
+	front.x = cos(radians(YAW)) * cos(radians(PITCH));
+	front.y = sin(radians(PITCH));
+	front.z = sin(radians(YAW)) * cos(radians(PITCH));
+	cameraFront = normalize(front);
+}
+
+void Camara::MouseScroll(GLFWwindow * window, double xScroll, double yScroll)
+{
+	
+
+}
+
+mat4 Camara::LookAt()
+{
+	vec3 worldUp = vec3(0.0f, 1.0f, 0.0f);
+
+	vec3 cameraRight = normalize(cross(cameraFront, worldUp));
+	cameraUp = cross(cameraFront, cameraRight);
+
+	mat4 MatrixVector;
+	//Es posen a la inversa perque glm o detecta al reves
+	MatrixVector[0][0] = cameraRight.x;
+	MatrixVector[1][0] = cameraRight.y;
+	MatrixVector[2][0] = cameraRight.z;
+
+	MatrixVector[0][1] = cameraUp.x;
+	MatrixVector[1][1] = cameraUp.y;
+	MatrixVector[2][1] = cameraUp.z;
+
+	MatrixVector[0][2] = cameraFront.x;
+	MatrixVector[1][2] = cameraFront.y;
+	MatrixVector[2][2] = cameraFront.z;
+
+	mat4 MatrixPosition;
+	//Es posen a la inversa perque glm o detecta al reves
+	MatrixPosition[3][0] = -cameraPos.x;
+	MatrixPosition[3][1] = -cameraPos.y;
+	MatrixPosition[3][2] = -cameraPos.z;
+
+	mat4 MatrixResultado = MatrixVector * MatrixPosition;
+
+	return MatrixResultado;
+}
+
+GLfloat Camara::GetFOV()
+{
+	
+	return GLfloat();
+}
+
+
+Camara::~Camara()
+{
+
+}
