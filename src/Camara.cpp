@@ -42,8 +42,13 @@ void Camara::DoMovement(GLFWwindow * window)
 	if (Status == GLFW_PRESS) {
 		cameraPos -= normalize(cross(cameraFront, cameraUp)) * Sensitivity * Deltatime;
 	}
+	/*
+	Status = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
+	if (Status == GLFW_PRESS) {
+		//Camara::MouseMove(window,x,y);
+	}
 
-	/* //ADELANTE
+	 //ADELANTE
 	Status = glfwGetKey(window, GLFW_KEY_S);
 	if (Status == GLFW_PRESS) {
 		cameraPos.z += cameraPos.z * Sensitivity;
@@ -58,7 +63,7 @@ void Camara::DoMovement(GLFWwindow * window)
 
 void Camara::MouseMove(GLFWwindow * window, double xpos, double ypos)
 {
-	GLfloat lastX = 400, lastY = 300;
+	
 	//REVISAR
 	if (firstMouse)
 	{
@@ -85,16 +90,26 @@ void Camara::MouseMove(GLFWwindow * window, double xpos, double ypos)
 	if (PITCH < -89.0f)
 		PITCH = -89.0f;
 
-	vec3 front;
-	front.x = cos(radians(YAW)) * cos(radians(PITCH));
-	front.y = sin(radians(PITCH));
-	front.z = sin(radians(YAW)) * cos(radians(PITCH));
-	cameraFront = normalize(front);
+	if (YAW > 89.0f)
+		YAW = 89.0f;
+	if (YAW < -89.0f)
+		YAW = -89.0f;
+
+	vec3 apuntado;
+	apuntado.x = cos(radians(YAW)) * cos(radians(PITCH));
+	apuntado.y = sin(radians(PITCH));
+	apuntado.z = sin(radians(YAW)) * cos(radians(PITCH));
+	cameraFront = normalize(apuntado);
 }
 
 void Camara::MouseScroll(GLFWwindow * window, double xScroll, double yScroll)
 {
-	
+	if (FOV >= 1.0f && FOV <= 100.0f)
+		FOV -= yScroll;
+	if (FOV <= 1.0f)
+		FOV = 1.0f;
+	if (FOV >= 45.0f)
+		FOV = 45.0f;
 
 }
 
@@ -133,7 +148,7 @@ mat4 Camara::LookAt()
 GLfloat Camara::GetFOV()
 {
 	
-	return GLfloat();
+	return FOV;
 }
 
 

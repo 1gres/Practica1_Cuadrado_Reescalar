@@ -35,7 +35,10 @@ bool TeclaLeft = false;
 bool TeclaRight = false;
 bool Tecla1 = false;
 bool Tecla2 = false;
-bool firstMouse = true;
+bool firstMouse = false;
+
+//Camara
+
 
 static void error_callback(int error, const char* description)
 {
@@ -44,6 +47,18 @@ static void error_callback(int error, const char* description)
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 
+void MoveMouse(GLFWwindow * window, double xpos, double ypos);
+
+void MouseScroll(GLFWwindow* window, double xoffset, double yoffset);
+
+vec3 posicion_camara = vec3(0.0f, 0.0f, 3.0f);
+vec3 apuntado_camara = vec3(0.0f, 0.0f, 0.0f);
+vec3 direccion_camara = posicion_camara - apuntado_camara;
+GLfloat sensivilidad = 0.005;
+GLfloat FOV = 45.0;
+
+//init camera
+Camara Camara_move(posicion_camara, direccion_camara, sensivilidad, FOV);
 
 int main() {
 
@@ -59,7 +74,7 @@ int main() {
 
 	//create a window
 
-	
+
 
 	GLFWwindow* window;
 	glfwSetErrorCallback(error_callback);
@@ -74,7 +89,6 @@ int main() {
 	glfwMakeContextCurrent(window);
 
 	//set GLEW and inicializate
-	
 
 	glewExperimental = GL_TRUE;
 	if (GLEW_OK != glewInit()) {
@@ -85,6 +99,10 @@ int main() {
 
 	//set function when callback
 	glfwSetKeyCallback(window, key_callback);
+
+
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetScrollCallback(window, MouseScroll);
 
 	//set windows and viewport
 	int screenWithd, screenHeight;
@@ -100,19 +118,19 @@ int main() {
 	// Definir el buffer de vertices
 	/*GLfloat VertexBufferCube[] =
 	{
-		//Positions			//colors           //Texture Coords 
-		0.5f,  0.5f, 0.0f,		0.0f,0.1f,0.4f,  1.0f,1.0f,// Top Right
-		0.5f, -0.5f, 0.0f,		0.0f,1.0f,0.0f,  1.0f,0.0f,// Bottom Right
-		-0.5f, -0.5f, 0.0f,		0.0f,1.0f,0.0f,  0.0f,0.0f,// Bottom Left
-		-0.5f,  0.5f, 0.0f,		0.0f,0.1f,0.4f,  0.0f,1.0f// Top Left 
+	//Positions			//colors           //Texture Coords
+	0.5f,  0.5f, 0.0f,		0.0f,0.1f,0.4f,  1.0f,1.0f,// Top Right
+	0.5f, -0.5f, 0.0f,		0.0f,1.0f,0.0f,  1.0f,0.0f,// Bottom Right
+	-0.5f, -0.5f, 0.0f,		0.0f,1.0f,0.0f,  0.0f,0.0f,// Bottom Left
+	-0.5f,  0.5f, 0.0f,		0.0f,0.1f,0.4f,  0.0f,1.0f// Top Left
 
 	};
 
-	// Definir el EBO 
+	// Definir el EBO
 	GLuint CubesPositionBuffer[]{
 
-		0,1,2, //Triangle 1 Super Esquerra, Inferior Esquerra, Super Dret
-		0,2,3  //Triangle 2 Super Esquerra, Inferior dret, Superior Dret
+	0,1,2, //Triangle 1 Super Esquerra, Inferior Esquerra, Super Dret
+	0,2,3  //Triangle 2 Super Esquerra, Inferior dret, Superior Dret
 	};*/
 
 	GLfloat VertexBufferCube[] = {
@@ -189,8 +207,8 @@ int main() {
 	//Declarar el VBO y el EBO
 	glBindBuffer(GL_ARRAY_BUFFER, VBO); //Ordena la informacio per cada taquilla (Buffer)
 	glBufferData(GL_ARRAY_BUFFER, sizeof(VertexBufferCube), VertexBufferCube, GL_STATIC_DRAW); //Li pases la informacio dels vertex
-																			 //Variable(Variable especial per al VBO/EBO, tamany del que volem pasar, nom de la variable d'on passem el tamany, Dinamic/Statick -> Dibuixar)
-	// bufer de posicion																									 //Establecer las propiedades de los vertices
+																							   //Variable(Variable especial per al VBO/EBO, tamany del que volem pasar, nom de la variable d'on passem el tamany, Dinamic/Statick -> Dibuixar)
+																							   // bufer de posicion																									 //Establecer las propiedades de los vertices
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GL_FLOAT), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
 
@@ -216,7 +234,7 @@ int main() {
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, TexturaX, TexturaY, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
 	SOIL_free_image_data(image);
 	glBindTexture(GL_TEXTURE_2D, 0);
-	
+
 	GLuint texture2;
 	glGenTextures(1, &texture2);
 	glBindTexture(GL_TEXTURE_2D, texture2);
@@ -236,16 +254,6 @@ int main() {
 	GLfloat AngleRotacioY = 0.0;
 
 	GLfloat AspectRatio = WIDTH / HEIGHT;
-
-	//Camara
-	
-	vec3 posicion_camara = vec3(0.0f,0.0f,3.0f);
-	vec3 apuntado_camara = vec3(0.0f, 0.0f, 0.0f);
-	vec3 direccion_camara = posicion_camara - apuntado_camara;
-	GLfloat sensivilidad = 0.02;
-	GLfloat FOV = 45.0;
-
-	Camara Camara_move(posicion_camara, direccion_camara, sensivilidad, FOV);
 
 	//bucle de dibujado
 	while (!glfwWindowShouldClose(window))
@@ -271,20 +279,20 @@ int main() {
 		move.USE();
 
 		mat4 model;
-		mat4 view; 
+		mat4 view;
 		mat4 projection;
 
-		projection = perspective(45.0f, AspectRatio, 0.1f, 1000.0f);
+		projection = perspective(Camara_move.GetFOV(), AspectRatio, 0.1f, 1000.0f);
 
 		model = translate(model, vec3(0.0f, -0.5f, 0.0f));
-		model = rotate(model, AngleRotacioX , vec3(1.0f,0.0f, 0.0f));
+		model = rotate(model, AngleRotacioX, vec3(1.0f, 0.0f, 0.0f));
 		model = rotate(model, AngleRotacioY, vec3(0.0f, 1.0f, 0.0f));
 		model = scale(model, vec3(0.5f, 0.5f, 0.5f));
 
 		//view = translate(view, vec3(0.0f, 0.0f, -3.f));
-		
+
 		view = Camara_move.LookAt();
-				
+
 		GLint ProjLoc = glGetUniformLocation(move.Program, "projection");
 		GLint ViewLoc = glGetUniformLocation(move.Program, "view");
 		GLint ModelLoc = glGetUniformLocation(move.Program, "model");
@@ -296,10 +304,8 @@ int main() {
 		//detecta per pantalla quines tecles es presionen
 		Camara_move.DoMovement(window);
 
-		Camara_move.MouseMove(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	
-		//glfwSetCursorPosCallback(window, Camara_move.MouseMove);
-	
+		glfwSetCursorPosCallback(window, MoveMouse);
+
 		//Modificades totes les direccions
 		if (TeclaDown) {
 			AngleRotacioX -= 0.05;
@@ -322,21 +328,21 @@ int main() {
 			AngleRotacioY += 0.05;
 			TeclaLeft = false;
 		}
-		
+
 		//pintar el VAO
 		glBindVertexArray(VAO);
 
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
-		
+
 		for (GLint i = 1; i < 10; i++)
 		{
 			mat4 model;
-	
+
 			model = translate(model, CubesPositionBuffer[i]);
 			model = rotate(model, (GLfloat)glfwGetTime()*5.0f, vec3(1.0f, 0.3f, 0.0f));
-		
-		
+
+
 			glUniformMatrix4fv(glGetUniformLocation(move.Program, "model"), 1, GL_FALSE, value_ptr(model));
 			/*
 			model = rotate(model, (GLfloat)glfwGetTime() *1.0f, CubesPositionBuffer[1]);
@@ -345,7 +351,7 @@ int main() {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
-		
+
 		glBindVertexArray(0);
 
 
@@ -357,7 +363,7 @@ int main() {
 	// liberar la memoria de los VAO, EBO y VBO
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
-	
+
 	// Terminate GLFW, clearing any resources allocated by GLFW.
 	glfwDestroyWindow(window);
 	glfwTerminate();
@@ -366,7 +372,7 @@ int main() {
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode) {
 	//TODO, comprobar que la tecla pulsada es escape para cerrar la aplicación y la tecla w para cambiar a modo widwframe
-		if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
 
 	if (key == GLFW_KEY_W && action == GLFW_PRESS)
@@ -376,7 +382,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		else
 			TeclaW = true;
 	}
-	
+
 	if (key == GLFW_KEY_UP)
 	{
 		if (TeclaUp)
@@ -389,20 +395,20 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			TeclaDown = false;
 		else
 			TeclaDown = true;
-	
-	if (key == GLFW_KEY_LEFT )
+
+	if (key == GLFW_KEY_LEFT)
 		if (TeclaLeft)
 			TeclaLeft = false;
 		else
 			TeclaLeft = true;
 
-	if (key == GLFW_KEY_RIGHT )
+	if (key == GLFW_KEY_RIGHT)
 		if (TeclaRight)
 			TeclaRight = false;
 		else
 			TeclaRight = true;
 
-	if( key == GLFW_KEY_1 && action == GLFW_PRESS)
+	if (key == GLFW_KEY_1 && action == GLFW_PRESS)
 		if (Tecla1)
 			Tecla1 = false;
 		else
@@ -412,4 +418,21 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			Tecla2 = false;
 		else
 			Tecla2 = true;
+}
+/*
+void mouse_callback(GLFWwindow * window, double xpos, double ypos) {
+Camara *Cam;
+Cam->MouseMove(window,xpos,ypos);
+}*/
+
+void MoveMouse(GLFWwindow* window, double xpos, double ypos) {
+
+	Camara_move.MouseMove(window, xpos, ypos);
+
+
+}
+
+void MouseScroll(GLFWwindow * window, double xoffset, double yoffset)
+{
+	Camara_move.MouseScroll(window, xoffset, yoffset);
 }

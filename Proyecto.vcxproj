@@ -21,11 +21,13 @@
   <ItemGroup>
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="SOIL\SOIL.c" />
+    <ClCompile Include="src\Camara.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h" />
     <ClInclude Include="SOIL\SOIL.h" />
+    <ClInclude Include="src\Camara.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\SimpleFragmentShader.fragmentshader" />
