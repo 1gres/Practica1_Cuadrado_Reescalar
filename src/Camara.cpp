@@ -90,21 +90,17 @@ void Camara::MouseMove(GLFWwindow * window, double xpos, double ypos)
 	if (PITCH < -89.0f)
 		PITCH = -89.0f;
 
-	if (YAW > 89.0f)
-		YAW = 89.0f;
-	if (YAW < -89.0f)
-		YAW = -89.0f;
-
 	vec3 apuntado;
-	apuntado.x = cos(radians(YAW)) * cos(radians(PITCH));
+	// He canviat la Z per la X per a que el control sigui fluit. Ja que s'han de modificar la X y la Y principalment
+	apuntado.z = cos(radians(YAW)) * cos(radians(PITCH));
 	apuntado.y = sin(radians(PITCH));
-	apuntado.z = sin(radians(YAW)) * cos(radians(PITCH));
+	apuntado.x = sin(radians(YAW)) * cos(radians(PITCH));
 	cameraFront = normalize(apuntado);
 }
 
 void Camara::MouseScroll(GLFWwindow * window, double xScroll, double yScroll)
 {
-	if (FOV >= 1.0f && FOV <= 100.0f)
+	if (FOV >= 1.0f && FOV <= 45.0f)
 		FOV -= yScroll;
 	if (FOV <= 1.0f)
 		FOV = 1.0f;
